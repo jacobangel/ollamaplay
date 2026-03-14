@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# OllamaPlay
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web UI for running and chatting with local Ollama models — featuring streaming chat, a parameter playground, and hardware-aware model management.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Chat** — Streaming conversation interface with any locally available Ollama model
+- **Playground** — Adjust generation parameters (temperature, top-p, top-k, repeat penalty, seed) and view real-time performance stats (tokens/sec, eval duration)
+- **Models** — Browse, pull, and delete models; hardware-aware filtering recommends models based on detected NVIDIA/AMD GPU or CPU-only setup
+- **Dark mode** — Full dark theme support
+- **Model catalog** — 10 curated models with metadata (size, tags, description)
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Node.js 18+**
+- **Ollama** running locally on port `11434` — [install Ollama](https://ollama.com)
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone <repo-url>
+cd ollamaplay
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app opens at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The hardware detection server starts automatically on port `3001`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+
 ```
+src/
+  components/      # Shared UI components
+  views/
+    Chat/          # Streaming chat interface
+    Playground/    # Params panel + streaming + perf stats
+    Models/        # Pull/delete + hardware-aware catalog
+  stores/          # Zustand state (chat, models, playground)
+  hooks/           # Shared React hooks
+server/
+  hardware.ts      # Express server for GPU detection (port 3001)
+e2e/               # Playwright end-to-end tests
+```
+
+## Development Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start Vite dev server + hardware API server |
+| `npm run build` | TypeScript compile + Vite production build |
+| `npm run test` | Run Vitest unit tests |
+| `npm run verify` | Lint + type-check + unit tests |
+| `npm run test:e2e` | Run Playwright end-to-end tests |
+
+## Architecture
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Frontend (Vite) | `5173` | React SPA |
+| Hardware API (Express) | `3001` | NVIDIA/AMD GPU detection via `nvidia-smi` / `rocm-smi` |
+| Ollama | `11434` | Local LLM inference server (external dependency) |
+
+The frontend proxies `/api/hardware` to port `3001` and calls Ollama's REST API directly.
+
+## Tech Stack
+
+- **React 19** + **TypeScript** + **Vite**
+- **Tailwind CSS 4** for styling
+- **Zustand** for state management
+- **Express** for the hardware detection sidecar
+- **Vitest** for unit tests
+- **Playwright** for end-to-end tests
