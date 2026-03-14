@@ -46,4 +46,16 @@ describe('useAppStore', () => {
     useAppStore.getState().setInstalledModels(models)
     expect(useAppStore.getState().installedModels).toEqual(models)
   })
+
+  it('hydrates theme from localStorage on initialization', () => {
+    localStorage.setItem('theme', 'light')
+    useAppStore.setState(getInitialState())
+    expect(useAppStore.getState().theme).toBe('light')
+  })
+
+  it('setHardware updates hardware', () => {
+    const hardware = { gpu: { name: 'RTX 3070 Ti', vramGb: 8 }, ram: { totalGb: 32 } }
+    useAppStore.getState().setHardware(hardware)
+    expect(useAppStore.getState().hardware).toEqual(hardware)
+  })
 })

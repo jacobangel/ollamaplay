@@ -33,6 +33,7 @@ async function detectGpu() {
     const data = JSON.parse(stdout)
     const card = Object.values(data)[0] as Record<string, string>
     const vramBytes = parseInt(Object.values(card)[0] as string, 10)
+    if (isNaN(vramBytes)) return { name: 'Unknown', vramGb: 0 }
     return { name: 'AMD GPU', vramGb: Math.round(vramBytes / (1024 ** 3)) }
   } catch {
     // rocm-smi not available
