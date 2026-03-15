@@ -1,6 +1,6 @@
 import type { OllamaModel } from '../store/useAppStore'
 
-const OLLAMA_BASE = 'http://localhost:11434'
+const OLLAMA_BASE = '/ollama'
 
 export type { OllamaModel }
 

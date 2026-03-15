@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"tsx watch server/src/index.ts\"",
+    "dev": "concurrently \"vite\" \"tsx watch server/src/index.ts\" \"ollama serve\"",
     "build": "vite build && npm run build:server",
     "build:server": "tsc -p server/tsconfig.json --outDir server/dist",
     "lint": "eslint .",

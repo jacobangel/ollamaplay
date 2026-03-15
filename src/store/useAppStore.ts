@@ -20,6 +20,7 @@ interface AppState {
   hardware: HardwareInfo | null
   pullingModel: string | null
   pullProgress: { completed: number; total: number } | null
+  ollamaStatus: 'unknown' | 'online' | 'offline'
 
   setView: (view: AppState['currentView']) => void
   setTheme: (theme: AppState['theme']) => void
@@ -28,6 +29,7 @@ interface AppState {
   setHardware: (hardware: HardwareInfo | null) => void
   setPullingModel: (model: string | null) => void
   setPullProgress: (progress: { completed: number; total: number } | null) => void
+  setOllamaStatus: (status: AppState['ollamaStatus']) => void
 }
 
 // Exported for test resets — reads localStorage fresh each call so beforeEach({ localStorage.clear() }) works correctly
@@ -40,6 +42,7 @@ export function getInitialState() {
     hardware: null as HardwareInfo | null,
     pullingModel: null as string | null,
     pullProgress: null as { completed: number; total: number } | null,
+    ollamaStatus: 'unknown' as AppState['ollamaStatus'],
   }
 }
 
@@ -55,4 +58,5 @@ export const useAppStore = create<AppState>()((set) => ({
   setHardware: (hardware) => set({ hardware }),
   setPullingModel: (pullingModel) => set({ pullingModel, pullProgress: null }),
   setPullProgress: (pullProgress) => set({ pullProgress }),
+  setOllamaStatus: (ollamaStatus) => set({ ollamaStatus }),
 }))

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { MODEL_CATALOG, filterByHardware } from '../data/modelCatalog'
 import { deleteModel, pullModel, listModels } from '../hooks/useOllama'
@@ -16,6 +16,8 @@ export function ModelsView() {
     setPullProgress,
   } = useAppStore()
 
+  const [pullError, setPullError] = useState<string | null>(null)
+
   const installedIds = installedModels.map(m => m.name)
   const available = filterByHardware(MODEL_CATALOG, hardware, installedIds)
   const tooLarge = hardware && hardware.gpu.vramGb > 0
@@ -30,9 +32,14 @@ export function ModelsView() {
 
   const handlePull = async (modelId: string) => {
     setPullingModel(modelId)
+    setPullError(null)
     try {
       await pullModel(modelId, (completed, total) => setPullProgress({ completed, total }))
       await refreshModels()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Pull failed'
+      const isConnectionError = msg.includes('ECONNREFUSED') || msg.includes('Failed to fetch') || msg.includes('NetworkError')
+      setPullError(isConnectionError ? 'Cannot reach Ollama. Is it running? Try: ollama serve' : msg)
     } finally {
       setPullingModel(null)
     }
@@ -120,6 +127,12 @@ export function ModelsView() {
         </section>
       )}
 
+      {pullError && (
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+          Pull failed: {pullError}
+        </div>
+      )}
+
       {/* Available models */}
       {available.length > 0 && (
         <section>
@@ -130,7 +143,7 @@ export function ModelsView() {
             {available.map(model => {
               const isPulling = pullingModel === model.id
               const progress = isPulling && pullProgress
-                ? Math.round((pullProgress.completed / pullProgress.total) * 100)
+                ? Math.round((pullProgress.completed / Math.max(pullProgress.total, 1)) * 100)
                 : 0
 
               return (

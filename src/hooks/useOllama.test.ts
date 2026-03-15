@@ -43,7 +43,7 @@ describe('deleteModel', () => {
     vi.stubGlobal('fetch', mockFetch)
     await deleteModel('llama3.2:3b')
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:11434/api/delete',
+      '/ollama/api/delete',
       expect.objectContaining({ method: 'DELETE' }),
     )
   })
